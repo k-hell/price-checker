@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-export default function StoreCard() {
+type StoreCardProps = {
+  onSubmit: () => void;
+};
+
+export default function StoreCard({ onSubmit }: StoreCardProps) {
   const [store, setStore] = useState<string>("");
   const [tempStore, setTempStore] = useState<string>("");
   const [objectInput, setObjectInput] = useState<string>("");
@@ -41,6 +45,10 @@ export default function StoreCard() {
     setItems(newItems);
   };
 
+  const handleNextStore = () => {
+    onSubmit();
+  };
+
   return (
     <>
       <Card className="flex w-1/6 flex-col items-center justify-center gap-3 p-3">
@@ -60,32 +68,22 @@ export default function StoreCard() {
               <div className="flex flex-col gap-3">
                 {items.map((item, index) => (
                   <div key={index} className="flex gap-3">
-                    <Input
-                      value={item.object}
-                      disabled={item.isDisabled}
-                      placeholder="object1"
-                    />
-                    <Input
-                      value={item.value}
-                      disabled={item.isDisabled}
-                      placeholder="value1"
-                    />
+                    <Input value={item.object} disabled placeholder="object" />
+                    <Input value={item.value} disabled placeholder="value" />
                   </div>
                 ))}
-                {items.length >= 0 && (
-                  <div className="flex gap-3">
-                    <Input
-                      placeholder="object2"
-                      value={objectInput}
-                      onChange={(e) => setObjectInput(e.target.value)}
-                    />
-                    <Input
-                      placeholder="value2"
-                      value={valueInput}
-                      onChange={(e) => setValueInput(e.target.value)}
-                    />
-                  </div>
-                )}
+                <div className="flex gap-3">
+                  <Input
+                    placeholder="object"
+                    value={objectInput}
+                    onChange={(e) => setObjectInput(e.target.value)}
+                  />
+                  <Input
+                    placeholder="value"
+                    value={valueInput}
+                    onChange={(e) => setValueInput(e.target.value)}
+                  />
+                </div>
               </div>
               <div className="flex justify-between">
                 <Button
@@ -105,7 +103,11 @@ export default function StoreCard() {
               </div>
             </div>
             {items.length > 1 && (
-              <Button className="w-1/3" variant="secondary">
+              <Button
+                className="w-1/3"
+                variant="secondary"
+                onClick={handleNextStore}
+              >
                 Submit
               </Button>
             )}
