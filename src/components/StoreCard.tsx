@@ -29,7 +29,10 @@ export default function StoreCard({ onSubmit }: StoreCardProps) {
   };
 
   const handleAddItem = () => {
-    if (!objectInput || !valueInput) return;
+    if (!objectInput || !valueInput) {
+      console.log("Error: Both fields are required.");
+      return;
+    }
     setItems([
       ...items,
       { object: objectInput, value: valueInput, isDisabled: true },
