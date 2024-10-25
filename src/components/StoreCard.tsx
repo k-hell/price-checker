@@ -1,15 +1,19 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 type StoreCardProps = {
-  onSubmit: () => void;
+  onSubmit: (objects: string[]) => void;
+  syncedObjects?: string[];
 };
 
-export default function StoreCard({ onSubmit }: StoreCardProps) {
+export default function StoreCard({
+  onSubmit,
+  syncedObjects = [],
+}: StoreCardProps) {
   const [store, setStore] = useState<string>("");
   const [tempStore, setTempStore] = useState<string>("");
   const [objectInput, setObjectInput] = useState<string>("");
@@ -41,15 +45,34 @@ export default function StoreCard({ onSubmit }: StoreCardProps) {
     setValueInput("");
   };
 
-  const handleRemoveItem = () => {
-    if (items.length === 0) return;
-    const newItems = [...items];
-    newItems.pop();
-    setItems(newItems);
+  const handleSubmit = () => {
+    if (items.some((item) => !item.value)) {
+      console.log("Error: All items must have values.");
+      return;
+    }
+    onSubmit(items.map((item) => item.object));
   };
 
-  const handleNextStore = () => {
-    onSubmit();
+  const handleRemoveItem = () => {
+    setItems((prevItems) => prevItems.slice(0, -1));
+  };
+
+  useEffect(() => {
+    if (syncedObjects.length > 0) {
+      setItems(
+        syncedObjects.map((object) => ({
+          object,
+          value: "",
+          isDisabled: false,
+        })),
+      );
+    }
+  }, [syncedObjects]);
+
+  const handleValueChange = (index: number, value: string) => {
+    setItems((prevItems) =>
+      prevItems.map((item, i) => (i === index ? { ...item, value } : item)),
+    );
   };
 
   return (
@@ -72,7 +95,11 @@ export default function StoreCard({ onSubmit }: StoreCardProps) {
                 {items.map((item, index) => (
                   <div key={index} className="flex gap-3">
                     <Input value={item.object} disabled placeholder="object" />
-                    <Input value={item.value} disabled placeholder="value" />
+                    <Input
+                      value={item.value}
+                      onChange={(e) => handleValueChange(index, e.target.value)}
+                      placeholder="value"
+                    />
                   </div>
                 ))}
                 <div className="flex gap-3">
@@ -107,9 +134,9 @@ export default function StoreCard({ onSubmit }: StoreCardProps) {
             </div>
             {items.length > 1 && (
               <Button
-                className="w-1/3"
+                className="mt-3 w-1/3"
                 variant="secondary"
-                onClick={handleNextStore}
+                onClick={handleSubmit}
               >
                 Submit
               </Button>
