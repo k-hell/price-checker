@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Price Comparison</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .store {
+        margin: 20px 0;
+      }
+      .item {
+        margin: 5px 0;
+      }
+      .title {
+        font-weight: bold;
+      }
+      .total {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+      .comparison {
+        color: darkgreen;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Price Comparison Against Original</h1>
+    <div id="price-list"></div>
+
+    <script>
+      const prices = {
+        GameBillet: [
+          { title: "Winds of Change", price: 14.47 },
+          { title: "King of Kings", price: 11.96 },
+          { title: "Domination", price: 15.95 },
+          { title: "Lions of the North", price: 11.96 },
+        ],
+        "eTail.Market": [
+          { title: "Winds of Change", price: 15.36 },
+          { title: "King of Kings", price: 14.99 },
+          { title: "Domination", price: 13.33 },
+          { title: "Lions of the North", price: 8.28 },
+        ],
+        JoyBuggy: [
+          { title: "Winds of Change", price: 16.1 },
+          { title: "King of Kings", price: 11.71 },
+          { title: "Domination", price: 14.92 },
+          { title: "Lions of the North", price: 12.08 },
+        ],
+        WinGameStore: [
+          { title: "Winds of Change", price: 16.37 },
+          { title: "King of Kings", price: 11.08 },
+          { title: "Domination", price: 13.39 },
+          { title: "Lions of the North", price: 9 },
+        ],
+        "Gamer Thor": [
+          { title: "Winds of Change", price: 16.99 },
+          { title: "King of Kings", price: 10.19 },
+          { title: "Domination", price: 13.59 },
+          { title: "Lions of the North", price: 8.28 },
+        ],
+        "GamesPlanet US": [
+          { title: "Winds of Change", price: 17.55 },
+          { title: "King of Kings", price: 10.62 },
+          { title: "Domination", price: 14.31 },
+          { title: "Lions of the North", price: 8.77 },
+        ],
+        Fanatical: [
+          { title: "Winds of Change", price: 17.59 },
+          { title: "King of Kings", price: 12.44 },
+          { title: "Domination", price: 16.59 },
+          { title: "Lions of the North", price: 12.44 },
+        ],
+        GamersGate: [
+          { title: "Winds of Change", price: 17.99 },
+          { title: "King of Kings", price: 13.49 },
+          { title: "Domination", price: 17.99 },
+          { title: "Lions of the North", price: 13.49 },
+        ],
+        DLGamer: [
+          { title: "Winds of Change", price: 18.99 },
+          { title: "King of Kings", price: 11.99 },
+          { title: "Domination", price: 15.99 },
+          { title: "Lions of the North", price: 9.74 },
+        ],
+        "Epic Game Store": [
+          { title: "Winds of Change", price: 19.99 },
+          { title: "King of Kings", price: 11.99 },
+          { title: "Domination", price: 15.99 },
+          { title: "Lions of the North", price: 9.74 },
+        ],
+        AllYouPlay: [
+          { title: "Winds of Change", price: 17.99 },
+          { title: "King of Kings", price: 13.49 },
+          { title: "Domination", price: 17.99 },
+          { title: "Lions of the North", price: 13.49 },
+        ],
+        "2game": [
+          { title: "Winds of Change", price: 18.59 },
+          { title: "King of Kings", price: 13.94 },
+          { title: "Domination", price: 18.59 },
+          { title: "Lions of the North", price: 13.94 },
+        ],
+        Original: [
+          // Steam (Original)
+          { title: "Winds of Change", price: 19.99 },
+          { title: "King of Kings", price: 14.99 },
+          { title: "Domination", price: 19.99 },
+          { title: "Lions of the North", price: 14.99 },
+        ],
+      };
+
+      function displayPrices() {
+        const priceListDiv = document.getElementById("price-list");
+        priceListDiv.innerHTML = "";
+
+        // Identify the "Original" store as the last entry
+        const storeEntries = Object.entries(prices);
+        const originalStore = storeEntries.pop();
+        const [originalName, originalItems] = originalStore;
+
+        // Calculate the total for the Original store
+        const originalTotal = originalItems.reduce(
+          (acc, item) => acc + item.price,
+          0
+        );
+
+        // Calculate and sort other stores by their total cost relative to the Original store
+        const storeTotals = storeEntries
+          .map(([store, items]) => {
+            const total = items.reduce((acc, item) => acc + item.price, 0);
+            return { store, items, total };
+          })
+          .sort((a, b) => a.total - b.total);
+
+        // Display the Original store first
+        const originalDiv = document.createElement("div");
+        originalDiv.classList.add("store");
+        originalDiv.innerHTML = `<h2>${originalName}</h2>`;
+
+        let runningTotal = 0;
+        originalItems.forEach((item) => {
+          const itemDiv = document.createElement("div");
+          itemDiv.classList.add("item");
+          runningTotal += item.price;
+          itemDiv.innerHTML = `<span class="title">${
+            item.title
+          }</span>: $${item.price.toFixed(
+            2
+          )} (Running Total: $${runningTotal.toFixed(2)})`;
+          originalDiv.appendChild(itemDiv);
+        });
+
+        const originalTotalDiv = document.createElement("div");
+        originalTotalDiv.classList.add("total");
+        originalTotalDiv.innerHTML = `Total Cost for ${originalName}: $${originalTotal.toFixed(
+          2
+        )}`;
+        originalDiv.appendChild(originalTotalDiv);
+        priceListDiv.appendChild(originalDiv);
+
+        // Display other stores with comparison to the Original store
+        storeTotals.forEach(({ store, items, total }) => {
+          const storeDiv = document.createElement("div");
+          storeDiv.classList.add("store");
+          storeDiv.innerHTML = `<h2>${store}</h2>`;
+
+          let runningTotal = 0;
+          items.forEach((item, index) => {
+            const itemDiv = document.createElement("div");
+            itemDiv.classList.add("item");
+            runningTotal += item.price;
+
+            // Compare with the Original item's price
+            const originalPrice = originalItems[index].price;
+            const priceDifference = (item.price - originalPrice).toFixed(2);
+            const comparisonText =
+              item.price < originalPrice
+                ? `(Cheaper by $${Math.abs(priceDifference)})`
+                : item.price > originalPrice
+                ? `(More by $${priceDifference})`
+                : "(Same price)";
+
+            itemDiv.innerHTML = `<span class="title">${
+              item.title
+            }</span>: $${item.price.toFixed(
+              2
+            )} (Running Total: $${runningTotal.toFixed(
+              2
+            )}) <span class="comparison">${comparisonText}</span>`;
+            storeDiv.appendChild(itemDiv);
+          });
+
+          // Add the total cost for this store with comparison to the Original store's total
+          const totalDiv = document.createElement("div");
+          totalDiv.classList.add("total");
+          const totalDifference = (total - originalTotal).toFixed(2);
+          const totalComparison =
+            total < originalTotal
+              ? `(Cheaper by $${Math.abs(totalDifference)})`
+              : total > originalTotal
+              ? `(More by $${totalDifference})`
+              : "(Same total)";
+
+          totalDiv.innerHTML = `Total Cost for ${store}: $${total.toFixed(
+            2
+          )} <span class="comparison">${totalComparison}</span>`;
+          storeDiv.appendChild(totalDiv);
+
+          priceListDiv.appendChild(storeDiv);
+        });
+      }
+
+      displayPrices();
+    </script>
+  </body>
+</html>
